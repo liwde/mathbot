@@ -25,12 +25,20 @@ const helpMessages = [
     'Den vollen unterstützten Befehlssatz findest du unter http://docs.mathjax.org/en/latest/tex.html'
 ];
 
+
+if (process.env.MATOMO_URL) {
+    const usage = require('./usage');
+    bot.use(usage);
+    helpMessages.push('Wenn du den Bot mit dem Befehl `/math` benutzt, wird anonym gezählt, dass du den Bot genutzt hat, wie lange die Generierung gedauert hat und welche Sprache in Telegram eingestellt ist – _zu keinem Zeitpunkt wird dein Name, Nutzername, deine Nutzer-ID oder die von dir gesetzte Formel gespeichert_. Diese Aufstellung hilft mir dabei, potentielle Probleme aufzudecken und zu sehen, wie weit verbreitet der Bot ist.\nWenn du das nicht magst, kannst du aber auch gerne die ungetrackte Version `/math*` verwenden.');
+}
+
 /**
  * Main Handler Function: Bot hears text starting with mathMarker --> trim message, create png, respond
  */
 bot.hears(text => text.startsWith(mathMarker), async function(ctx) {
     try {
-        const tex = ctx.message.text.substr(mathMarker.length).trim();
+        const markerLength = ctx.message.text[mathMarker.length] === '*' ? mathMarker.length + 1 : mathMarker.length; // handle *
+        const tex = ctx.message.text.substr(markerLength).trim();
         if (!tex) return;
         const png = await typesetMaths(tex);
         await ctx.replyWithPhoto({ source: png });
@@ -94,3 +102,4 @@ function sendMultipleMessages(ctx, aMsg) {
 }
 
 bot.startPolling();
+console.log('Bot started');
