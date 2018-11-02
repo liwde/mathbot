@@ -7,6 +7,7 @@ mjAPI.config({
 mjAPI.start();
 
 dataUriToBuffer = require('data-uri-to-buffer');
+Jimp = require('jimp');
 
 const Telegraf = require('telegraf');
 const bot = new Telegraf(process.env.BOT_TOKEN);
@@ -40,14 +41,15 @@ bot.hears(text => text.startsWith(mathMarker), async function(ctx) {
         const markerLength = ctx.message.text[mathMarker.length] === '*' ? mathMarker.length + 1 : mathMarker.length; // handle *
         const tex = ctx.message.text.substr(markerLength).trim();
         if (!tex) return;
-        const png = await typesetMaths(tex);
+        let png = await typesetMaths(tex);
+        png = await scaleBox(png);
         await ctx.replyWithPhoto({ source: png });
     } catch (errors) {
         // one error at a time
         if (Array.isArray(errors)) {
-            await ctx.reply(errors[0]).catch(onError);
+            return await ctx.reply(errors[0]).catch(onError);
         }
-        onError(error);
+        onError(errors);
     }
 });
 
@@ -79,6 +81,25 @@ async function typesetMaths(sTeX) {
         scale: 5
     });
     return dataUriToBuffer(math.png);
+}
+
+const targetAspectRatio = 2.7; // maximum value before Telegram App starts cropping
+
+/**
+ * Resizes the Image Buffer so the Mobile Telegram Client won't crop the formula
+ * If resizing is necessary, this adds 50% to the runtime :/
+ * @param {Buffer} buffer
+ * @returns {Buffer} buffer
+ */
+async function scaleBox(buffer) {
+    const image = await Jimp.read(buffer);
+    if (image.bitmap.width / image.bitmap.height > targetAspectRatio) {
+        // image too wide --> adjust increase height to match maximal aspect ratio
+        image.contain(image.bitmap.width, image.bitmap.width / targetAspectRatio);
+        return await image.getBufferAsync(Jimp.MIME_PNG);
+    }
+    // no processing, just return the buffer
+    return buffer;
 }
 
 /**
