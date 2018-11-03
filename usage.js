@@ -59,8 +59,9 @@ function getAction(oMessage) {
 function buildRequest(id, action, lang, gt_ms) {
     const rand = Math.floor(Math.random()*1000);
     // try to get the country from the language
-    const locale = parseLocale(lang).langtag;
-    const country = (locale.region || locale.language.language || '').toLowerCase();
+    lang = lang || '';
+    const locale = (parseLocale(lang) || {}).langtag || {};
+    const country = (locale.region || (locale.language && locale.language.language) || '').toLowerCase();
     // basic request
     let base = `${matomoUrl}/piwik.php?idsite=${matomoSiteId}&rec=1&action_name=${action}&_id=${id}&rand=${rand}&apiv=1&gt_ms=${gt_ms}&lang=${lang}`;
     // reset IP address as this is total nonsense. also set country (both requires auth_token)
