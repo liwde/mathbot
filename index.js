@@ -83,7 +83,9 @@ async function typesetMaths(sTeX) {
     return dataUriToBuffer(math.png);
 }
 
-const targetAspectRatio = 2.7; // maximum value before Telegram App starts cropping
+// Maximum value before the Telegram App starts cropping
+// Telegram X has ~2.7, Telegram Android ~2.1
+const targetAspectRatio = 2.1;
 
 /**
  * Resizes the Image Buffer so the Mobile Telegram Client won't crop the formula
