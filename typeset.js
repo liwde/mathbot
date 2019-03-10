@@ -44,5 +44,11 @@ async function scaleBox(buffer) {
     return buffer;
 }
 
+async function typesetAndScale(sTeX) {
+    const png = await typesetMaths(sTeX);
+    return scaleBox(png);
+}
+
 module.exports.typesetMaths = typesetMaths;
 module.exports.scaleBox = scaleBox;
+module.exports.typesetAndScale = typesetAndScale;

@@ -1,5 +1,5 @@
 const { onError, sendMultipleMessages } = require('./util');
-const { typesetMaths, scaleBox } = require('./typeset');
+const { typesetAndScale } = require('./typeset');
 
 const Telegraf = require('telegraf');
 const bot = new Telegraf(process.env.BOT_TOKEN);
@@ -9,12 +9,14 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
  * BOT_TOKEN will be taken from environment variables
  */
 const mathMarker = "/math";
+const inlineMathMarker = "/im";
 const welcomeMessages = [
     'Hi!',
     'Schick mir TeX-formatierte Mathematik mit dem vorangestellten Befehl `/math` und ich antworte dir mit der hübsch gesetzten Formel. Der Befehl `/help` zeigt eine ausführlichere Hilfe.'
 ];
 const helpMessages = [
     'Probier es einfach mal aus:\n```\n/math \\nabla w_{pq}=-\\eta\\frac{\\partial E}{\\partial w_{pq}}\n```',
+    'Du kannst auch TeX inline setzen lassen. Starte deine Nachricht mit `/im` und setze die Formeln in Code-Blöcke (mit Markdown)',
     'Den vollen unterstützten Befehlssatz findest du unter http://docs.mathjax.org/en/latest/tex.html'
 ];
 
@@ -33,8 +35,7 @@ bot.hears(text => text.startsWith(mathMarker), async function(ctx) {
         const markerLength = ctx.message.text[mathMarker.length] === '*' ? mathMarker.length + 1 : mathMarker.length; // handle *
         const tex = ctx.message.text.substr(markerLength).trim();
         if (!tex) return;
-        let png = await typesetMaths(tex);
-        png = await scaleBox(png);
+        const png = await typesetAndScale(tex);
         await ctx.replyWithPhoto({ source: png });
     } catch (errors) {
         // one error at a time
@@ -43,6 +44,29 @@ bot.hears(text => text.startsWith(mathMarker), async function(ctx) {
         }
         onError(errors);
     }
+});
+
+/**
+ * Inline Math Handler Function: Bot hears text starting with inlineMathMarker --> find math, create pngs, respond
+ */
+bot.hears(text => text.startsWith(inlineMathMarker), async function(ctx) {
+    // async iteration: reduce through promises
+    return ctx.message.entities.reduce(async function(oPrev, element) {
+        await oPrev;
+        try {
+            if (element.type === 'code') {
+                const tex = ctx.message.text.substring(element.offset, element.offset + element.length);
+                const png = await typesetAndScale(tex);
+                return await ctx.replyWithPhoto({ source: png });
+            }
+        } catch (errors) {
+            // one error at a time
+            if (Array.isArray(errors)) {
+                return await ctx.reply(errors[0]).catch(onError);
+            }
+            onError(errors);
+        }
+    }, Promise.resolve());
 });
 
 /**
