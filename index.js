@@ -50,23 +50,21 @@ bot.hears(text => text.startsWith(mathMarker), async function(ctx) {
  * Inline Math Handler Function: Bot hears text starting with inlineMathMarker --> find math, create pngs, respond
  */
 bot.hears(text => text.startsWith(inlineMathMarker), async function(ctx) {
-    // async iteration: reduce through promises
-    return ctx.message.entities.reduce(async function(oPrev, element) {
-        await oPrev;
+    for (let element of ctx.message.entities) {
         try {
             if (element.type === 'code') {
                 const tex = ctx.message.text.substring(element.offset, element.offset + element.length);
                 const png = await typesetAndScale(tex);
-                return await ctx.replyWithPhoto({ source: png });
+                await ctx.replyWithPhoto({ source: png });
             }
         } catch (errors) {
             // one error at a time
             if (Array.isArray(errors)) {
-                return await ctx.reply(errors[0]).catch(onError);
+                await ctx.reply(errors[0]).catch(onError);
             }
             onError(errors);
         }
-    }, Promise.resolve());
+    }
 });
 
 /**
