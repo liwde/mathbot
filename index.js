@@ -17,7 +17,7 @@ const welcomeMessages = [
 const helpMessages = [
     'Probier es einfach mal aus:\n```\n/math \\nabla w_{pq}=-\\eta\\frac{\\partial E}{\\partial w_{pq}}\n```',
     'Du kannst auch TeX inline setzen lassen. Starte deine Nachricht mit `/im` und setze die Formeln in Code-Blöcke (mit Markdown)',
-    'Den vollen unterstützten Befehlssatz findest du unter http://docs.mathjax.org/en/latest/tex.html'
+    'Den vollen unterstützten Befehlssatz findest du unter http://docs.mathjax.org/en/latest/input/tex/macros/index.html'
 ];
 
 
