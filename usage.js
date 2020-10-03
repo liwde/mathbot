@@ -17,12 +17,12 @@ async function trackingMiddleware(ctx, next) {
     if (action === "math") {
         const id = getId(ctx.message);
         const start = new Date();
-        await next();
+        await next().catch(onError);
         const ms = new Date() - start;
         // send statistics, but don't wait for the result here
         got(buildRequest(id, action, ctx.message.from.language_code, ms)).catch(onError);
     } else {
-        await next();
+        await next().catch(onError);;
     }
 }
 
