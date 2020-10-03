@@ -9,6 +9,7 @@ const matomoToken = process.env.MATOMO_TOKEN;
 const md5 = require('md5');
 const got = require('got');
 const parseLocale = require('bcp47').parse;
+const { onError } = require('./util');
 
 async function trackingMiddleware(ctx, next) {
     // we only want to handle /math
@@ -19,7 +20,7 @@ async function trackingMiddleware(ctx, next) {
         await next();
         const ms = new Date() - start;
         // send statistics, but don't wait for the result here
-        got(buildRequest(id, action, ctx.message.from.language_code, ms)).catch((err)=>console.error(err));
+        got(buildRequest(id, action, ctx.message.from.language_code, ms)).catch(onError);
     } else {
         await next();
     }

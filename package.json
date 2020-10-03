@@ -11,6 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "bcp47": "^1.1.2",
+    "console-stamp": "^0.2.9",
     "data-uri-to-buffer": "^3.0.1",
     "got": "^11.7.0",
     "jimp": "^0.16.1",
