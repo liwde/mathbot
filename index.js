@@ -1,4 +1,4 @@
-require('console-stamp')(console, { pattern: 'dd-mm-yyyy HH:MM:ss' });
+require('console-stamp')(console, { pattern: 'yyyy-mm-dd HH:MM:ss' });
 
 const { onError, sendMultipleMessages } = require('./util');
 const { typesetAndScale } = require('./typeset');
