@@ -13,7 +13,7 @@
     "bcp47": "^1.1.2",
     "console-stamp": "^0.2.9",
     "data-uri-to-buffer": "^3.0.1",
-    "got": "^11.7.0",
+    "got": "^11.8.5",
     "jimp": "^0.16.1",
     "mathjax-node-svg2png": "^2.0.0",
     "md5": "^2.3.0",
